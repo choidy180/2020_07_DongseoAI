@@ -1,0 +1,122 @@
+html{
+    margin: 0px;
+    padding: 0px;
+}
+body{
+    margin: 0px;
+    padding: 0px;
+}
+.bg{ 
+    background-color:rgba(0, 0, 0, 0.6); /*살짝 투명한 검정으로 배경색*/ 
+    width:100%; 
+    height:1000px; 
+    position: absolute; /*다른 요소들 위로 겹쳐질 수 있게함*/
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+h1, p{
+    margin: 0px;
+} 
+#bgimg{
+    position: absolute;
+    margin: 0px;
+    height: 1000px;
+    min-height: 1000px;
+    overflow: hidden;
+    background-size:cover; 
+    display:block; 
+    width:100%;
+    min-width: 800px; 
+    color:#ffffff; 
+    text-align: center;
+    z-index: 10;
+} 
+/* 맨앞으로 빼기 */
+h1,p,a{ 
+    position: relative; z-index:1000; /*맨 앞으로 나오도록 함*/ 
+}
+
+.first_left_area{
+    width: 50%;
+    height: 100%;
+}
+.first_right_area{
+    width: 50%;
+    height: 100%;
+}
+.first_left_info{
+    text-align: left;
+    padding-left: 50px;
+}
+.main_top_city{
+    font-size: 150px;
+    font-weight: 100;
+    font-family: 'Do Hyeon', sans-serif;
+    margin-top: 150px;
+    animation: fadein 1.5s;
+    transition: all ease 0.5s 0s;
+}
+.main_top_city:hover{
+    font-size: 170px;
+    transition: all ease 0.5s 0s;
+}
+@keyframes fadein {
+    from {
+        opacity:0;
+    }
+    to {
+        opacity:1;
+    }
+}
+.main_top_time_box{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+#watch{
+    margin-top: -40px;
+    font-size: 120px;
+    font-family: 'Do Hyeon', sans-serif;
+    animation: fadein 1.5s;
+    transition: all ease 0.5s 0s;
+    transition: all ease 0.5s 0s;
+}
+#watch:hover{
+    font-size: 140px;
+    transition: all ease 0.5s 0s;
+}
+.main_top_time_apm{
+    font-size: 50px;
+}
+.weather_icon{
+    width: 200px;
+    height: auto;
+    transition: all ease 0.5s 0s;
+}
+.weather_icon:hover{
+    -webkit-transform: rotate(30deg);
+    transform: rotate(30deg);
+    transition: all ease 0.5s 0s;
+    width: 220px;
+}
+.blank_box{
+    width: 100%;
+    height: 5px;
+    background-color: #292A2D;
+    margin-bottom: 10px;
+}
+.weather_frame{
+    margin-top: 1030px;
+    position: absolute;
+    top: -100px;
+    left: -290px;
+    z-index: 0;
+}
+.input{
+    position: absolute;
+    z-index: 9999;
+}
