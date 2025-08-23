@@ -23,28 +23,27 @@
 ---
 
 ##  기능
-- 🔍 **검색 가능한 포켓몬 도감** (이름·번호로 검색)
--  **상세 정보 제공**: 스탯, 타입, 이미지 등
-- 🎨 **반응형 디자인**
--  **빠른 로딩 및 화면 전환** (Next.js의 ISR/SSG 활용)
--  **직관적인 UI 구성** (카드형 리스트, 모달, 탭 등)
+- ☀️ **전세계 각 도시별 날씨데이터 가져오기**
+- 🌈 **상세 정보 제공**: 시간별 날씨정보, 강우 확률 등 정보제공
+- 👗 **날씨별 의상추천** 날씨데이터 기반으로 사용자에게 의상추천, (이미지 조합으로 캐릭터로 제공)
+- 🛍️ **무신사 API 연동** 무신사 API 연동하여, 사용자에게 추천의상 구매 UI 노출시키고, 구매페이지로 이동
 
 ---
 
 ##  기술 스택
 <p align="center">
-  <img src="https://img.shields.io/badge/Next.js-000?logo=next.js" />
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff" />
-  <img src="https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=000" />
-  <img src="https://img.shields.io/badge/API-PokeAPI-059CFA?logo=api" />
-  <img src="https://img.shields.io/badge/CSS Modules-000?logo=css3&logoColor=fff" />
-  <img src="https://img.shields.io/badge/Vercel-000?logo=vercel&logoColor=fff" />
+  <img src="https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white" /> 
+  <img src="https://img.shields.io/badge/Express.js-000000?logo=express&logoColor=white" /> 
+  <img src="https://img.shields.io/badge/NPM-CB3837?logo=npm&logoColor=white" /> 
+  <img src="https://img.shields.io/badge/Yarn-2C8EBB?logo=yarn&logoColor=white" /> 
+  <img src="https://img.shields.io/badge/ESLint-4B32C3?logo=eslint&logoColor=white" /> 
+  <img src="https://img.shields.io/badge/Prettier-F7B93E?logo=prettier&logoColor=000" />
 </p>
 
 ---
 
 ##  라이브 데모
--  URL: **https://poke-next-amber.vercel.app**
+-  URL: 현재 미배포
 -  Next.js + Vercel 환경에서 배포 중
 
 ---
