@@ -49,15 +49,15 @@
 ---
 
 ##  프로젝트 요약
-#### 1. NextJS + 스타일컴포넌트 사용
-#### 2. 포켓몬 API 이용하여 1세대 포켓몬 목록 + 상세정보 불러오기
-#### 3. 배경으로 Noise 추가(스타일 컴포넌트)
+#### 1. NodeJS + 독일 기상청 Weather API 사용
+#### 2. 날씨데이터 기반으로 의상이미지 조합하여, 사용자에게 다양한 의상정보 제공
+#### 3. 날씨에 따라 무신사 추천 API 이용하여, 무신사 의상 추천 및 구매페이지 이동기능 제
 
 
 ##  Install
 ```bash
 # 1) 레포지토리 복제
-git clone https://github.com/choidy180/poke-next.git
+git clone https://github.com/choidy180/2020_07_DongseoAI
 cd poke-next
 
 # 2) 의존성 설치
@@ -71,230 +71,67 @@ npm run dev
 ## 📡 Example Fetch (Korean-localized PokeAPI helpers)
 ```bash
 
-// lib/pokeapi-extended.ts
-// PokeAPI helpers with Korean (ko) localization support.
-// - getPokemonListSummary(): list page (summary)
-// - getPokemonDetail(): detail with flavor text, genera, evolution
-// Exports TYPE_KO / STAT_KO for easy UI labels.
+<!DOCTYPE html>
+<html lang="ko">
 
-export type PokemonSummary = {
-  id: number;
-  name: string;          // en
-  localName?: string;    // ko (optional)
-  sprite: string | null;
-  types: string[];       // en keys (use TYPE_KO to map in UI)
-};
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <title><%= title %></title>
+</head>
 
-export type PokemonDetail = {
-  id: number;
-  name: string;          // en
-  localName?: string;    // ko
-  sprite: string | null;
-  types: string[];       // en keys
-  genera?: string;       // ko
-  flavor?: string;       // ko
-  height: number;
-  weight: number;
-  habitat?: string;      // en
-  color?: string;        // en
-  abilities: string[];   // en keys
-  stats: { name: string; base: number }[];
-  evolution: string[];   // en species names (flat order)
-};
+<body>
+    <div id="bgimg">
+        <div class="bg">
+            <div class="first_left_area">
+                <div class="first_left_info">
+                    <p class="main_top_city">BUSAN</p>
+                    <div class="main_top_time_box">
+                        <h1 id="watch">00:00</h1>&nbsp;&nbsp;&nbsp;<h1 id="am_pm">AP</h1>
+                    </div>
+                    <img class="weather_icon" src="sun.png" alt="sun" title="sun">
+                    <h1 class="main_top_city" style="margin-top: 20px;">맑은 하늘</h1>
+                    <div class="container">
+                        <div class="card">
+                            <h1 class="name" id="name"></h1>
+                            <p class="temp"></p>
+                            <p class="clouds"></p>
+                            <p class="desc"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="first_right_area">
+            </div>
+        </div>
+    </div>
+    <div class="blank_box">
+    </div>
+    <iframe class="weather_frame" width="1600px" height="1500px" src="https://www.weather.go.kr/w/index.do"
+        frameborder="0"></iframe>
+    <iframe class="weather_frame_2" width="1200px" height="900px"
+        src="https://earth.nullschool.net/#current/wind/surface/level/overlay=temp/orthographic=129.02,35.13,3000/loc=128.950,35.340"
+        frameborder="0"></iframe>
+    <div style="width: 50%; height: 150px; padding-left: 20px;">
+        <h1 class="name" id="name" style="color: white; font-size: 40px; opacity: 0.8;">
+        </h1>
+        <p class="temp" style="color: white; font-size: 20px; opacity: 0.8;"></p>
+        <p class="clouds" style="color: white; font-size: 20px; opacity: 0.8;"></p>
+        <p class="desc" style="color: white; font-size: 20px; opacity: 0.8;"></p>
+    </div>
+    <div class="input">
+        <input type="text" placeholder="도시를 입력하세요." class="input_text">
+        <input type="submit" value="확인" class="submit">
+      </div>
+    </div>
+    <script src="/js/background_img_change.js"></script>
+    <script src="/js/get_weather_info.js"></script>
+    <script src="/js/Time.js"></script>
+    <script src="js/now_temperatures.js"></script>
+    <script src="js/app.js"></script>
 
-export const TYPE_KO: Record<string, string> = {
-  normal: '노말', fire: '불꽃', water: '물', grass: '풀', electric: '전기',
-  ice: '얼음', fighting: '격투', poison: '독', ground: '땅', flying: '비행',
-  psychic: '에스퍼', bug: '벌레', rock: '바위', ghost: '고스트', dragon: '드래곤',
-  dark: '악', steel: '강철', fairy: '페어리',
-};
+</body>
 
-export const STAT_KO: Record<string, string> = {
-  hp: 'HP',
-  attack: '공격',
-  defense: '방어',
-  'special-attack': '특수공격',
-  'special-defense': '특수방어',
-  speed: '스피드',
-};
-
-const API = 'https://pokeapi.co/api/v2';
-const KOREAN = 'ko';
-const nameCache = new Map<number, string>(); // id -> 한글 이름름
-
-async function fetchJSON<T>(url: string): Promise<T> {
-  const res = await fetch(url, {
-    // cache: 'force-cache',
-    // next: { revalidate: 3600 },
-  });
-  if (!res.ok) {
-    throw new Error(`Fetch failed: ${res.status} ${res.statusText} (${url})`);
-  }
-  return res.json() as Promise<T>;
-}
-
-function extractIdFromURL(url: string): number | null {
-  // e.g. https://pokeapi.co/api/v2/pokemon/25/
-  const m = url.match(/\/pokemon\/(\d+)\/?$/);
-  return m ? Number(m[1]) : null;
-}
-
-function normalizeFlavor(text: string): string {
-  return text.replace(/\s+/g, ' ').replace(/\u000c/g, ' ').trim();
-}
-
-function pickKoFlavor(entries: any[]): string | undefined {
-  const ko = entries.find((e) => e.language?.name === KOREAN);
-  return ko ? normalizeFlavor(ko.flavor_text || '') : undefined;
-}
-
-function pickKoGenera(genera: any[]): string | undefined {
-  const ko = genera.find((g) => g.language?.name === KOREAN);
-  return ko?.genus;
-}
-
-async function fetchLocalName(idOrName: number | string): Promise<{ id: number; nameKo?: string }> {
-  // Try cache when numeric id
-  if (typeof idOrName === 'number') {
-    const cached = nameCache.get(idOrName);
-    if (cached) return { id: idOrName, nameKo: cached };
-  }
-
-  type Species = {
-    id: number;
-    names: { language: { name: string }; name: string }[];
-  };
-
-  const data = await fetchJSON<Species>(`${API}/pokemon-species/${idOrName}`);
-  const ko = data.names?.find((n) => n.language?.name === KOREAN)?.name;
-  if (ko) nameCache.set(data.id, ko);
-  return { id: data.id, nameKo: ko };
-}
-
-// LIST (summary)
-
-export async function getPokemonListSummary(
-  offset = 0,
-  limit = 20,
-  withKorean = true
-): Promise<PokemonSummary[]> {
-  type ListResp = {
-    results: { name: string; url: string }[];
-  };
-
-  const list = await fetchJSON<ListResp>(`${API}/pokemon?offset=${offset}&limit=${limit}`);
-
-  // Fetch each pokemon detail needed for sprite/types (1 request per item)
-  const rows = await Promise.all(
-    list.results.map(async (r) => {
-      const id = extractIdFromURL(r.url);
-      const key = id ?? r.name;
-
-      type Poke = {
-        id: number;
-        name: string;
-        sprites: any;
-        types: { type: { name: string } }[];
-      };
-
-      const p = await fetchJSON<Poke>(`${API}/pokemon/${key}`);
-
-      let localName: string | undefined;
-      if (withKorean) {
-        const cached = nameCache.get(p.id);
-        localName = cached ?? (await fetchLocalName(p.id)).nameKo;
-      }
-
-      const sprite =
-        p.sprites?.other?.['official-artwork']?.front_default ??
-        p.sprites?.front_default ??
-        null;
-
-      return {
-        id: p.id,
-        name: p.name,
-        localName,
-        sprite,
-        types: (p.types || []).map((t) => t.type?.name).filter(Boolean),
-      } as PokemonSummary;
-    })
-  );
-
-  // Keep list stable by id ASC
-  rows.sort((a, b) => a.id - b.id);
-  return rows;
-}
-
-// DETAIL
-
-export async function getPokemonDetail(
-  idOrName: number | string,
-  withKorean = true
-): Promise<PokemonDetail> {
-  type Poke = {
-    id: number;
-    name: string;
-    height: number;
-    weight: number;
-    sprites: any;
-    types: { type: { name: string } }[];
-    abilities: { ability: { name: string } }[];
-    stats: { base_stat: number; stat: { name: string } }[];
-  };
-
-  type Species = {
-    id: number;
-    names: { language: { name: string }; name: string }[];
-    flavor_text_entries: any[];
-    genera: any[];
-    habitat?: { name: string } | null;
-    color?: { name: string } | null;
-    evolution_chain?: { url: string } | null;
-  };
-
-  const p = await fetchJSON<Poke>(`${API}/pokemon/${idOrName}`);
-  const s = await fetchJSON<Species>(`${API}/pokemon-species/${p.id}`);
-
-  // cache ko name
-  const koName = s.names?.find((n) => n.language?.name === KOREAN)?.name;
-  if (koName) nameCache.set(p.id, koName);
-
-  const sprite =
-    (p as any).sprites?.other?.['official-artwork']?.front_default ??
-    (p as any).sprites?.front_default ??
-    null;
-
-  const detail: PokemonDetail = {
-    id: p.id,
-    name: p.name,
-    localName: withKorean ? koName : undefined,
-    sprite,
-    types: (p.types || []).map((t) => t.type?.name).filter(Boolean),
-    genera: pickKoGenera(s.genera || []),
-    flavor: pickKoFlavor(s.flavor_text_entries || []),
-    height: p.height,
-    weight: p.weight,
-    habitat: s.habitat?.name ?? undefined,
-    color: s.color?.name ?? undefined,
-    abilities: (p.abilities || []).map((a) => a.ability?.name).filter(Boolean),
-    stats: (p.stats || []).map((st) => ({ name: st.stat?.name, base: st.base_stat })),
-    evolution: [],
-  };
-
-  // Evolution chain (flat)
-  if (s.evolution_chain?.url) {
-    type EvoResp = { chain: any };
-    const evo = await fetchJSON<EvoResp>(s.evolution_chain.url);
-    const acc: string[] = [];
-    const walk = (node: any) => {
-      if (!node) return;
-      if (node.species?.name) acc.push(node.species.name);
-      (node.evolves_to || []).forEach(walk);
-    };
-    walk(evo.chain);
-    detail.evolution = acc;
-  }
-
-  return detail;
-}
+</html>
 ```
